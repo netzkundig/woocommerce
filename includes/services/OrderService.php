@@ -12,6 +12,7 @@ use UnzerSDK\Resources\Customer;
 use UnzerSDK\Resources\EmbeddedResources\Address;
 use UnzerSDK\Resources\EmbeddedResources\BasketItem;
 use UnzerSDK\Resources\Payment;
+use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
 use WC_Order;
 use WC_Order_Item_Coupon;
@@ -19,6 +20,15 @@ use WC_Order_Refund;
 
 class OrderService
 {
+
+    /**
+     * @var LogService
+     */
+    protected $logger;
+
+    public function __construct(){
+        $this->logger = new LogService();
+    }
     /**
      * @param int|WC_Order $order
      * @return Basket
@@ -140,6 +150,8 @@ class OrderService
         $customer = (new Customer())
             ->setFirstname($order->get_billing_first_name())
             ->setLastname($order->get_billing_last_name())
+            ->setPhone($order->get_billing_phone())
+            ->setCompany($order->get_billing_company())
             ->setEmail($order->get_billing_email());
 
         $shippingType = ShippingTypes::EQUALS_BILLING;
@@ -151,6 +163,7 @@ class OrderService
             ->setStreet($order->get_shipping_address_1())
             ->setZip($order->get_shipping_postcode())
             ->setCity($order->get_shipping_city())
+            ->setState($order->get_shipping_state())
             ->setCountry($order->get_shipping_country())
             ->setShippingType($shippingType);
 
@@ -159,6 +172,7 @@ class OrderService
             ->setStreet($order->get_billing_address_1())
             ->setZip($order->get_billing_postcode())
             ->setCity($order->get_billing_city())
+            ->setState($order->get_billing_state())
             ->setCountry($order->get_billing_country());
 
         $customer
@@ -230,36 +244,42 @@ class OrderService
 
     public function updateRefunds($paymentId, $orderId)
     {
-        $unzer = (new PaymentService())->getUnzerManager();
+        $paymentService = new PaymentService();
+        $unzer = $paymentService->getUnzerManager();
         $payment = $unzer->fetchPayment($paymentId);
         if ($payment->getCancellations()) {
             $order = wc_get_order($orderId);
             $registeredRefunds = $order->get_refunds();
-
             /** @var Cancellation $unzerRefund */
             foreach ($payment->getCancellations() as $unzerRefund) {
+                $refundMatchingId = self::getUnzerCancellationId($unzerRefund);
+                $this->logger->debug('unzer refund data', [$unzerRefund->getId()]);
                 $unzerRefundAmount = $unzerRefund->getAmount();
                 /** @var WC_Order_Refund $registeredRefund */
                 foreach ($registeredRefunds as $registeredRefund) {
                     $registeredRefundUnzerId = $registeredRefund->get_meta(Main::ORDER_META_KEY_CANCELLATION_ID, true);
+
                     if ($registeredRefundUnzerId) {
-                        if ($registeredRefundUnzerId === $unzerRefund->getId()) {
+                        if ($registeredRefundUnzerId === $refundMatchingId) {
                             //this unzer refund is already registered
                             continue 2;
                         }
                         //this is registered to another unzer refund
                         continue;
                     }
-                    $registeredRefundAmount = abs($registeredRefund->get_total() + $registeredRefund->get_total_tax());
+                    $registeredRefundAmount = abs($registeredRefund->get_total());
+                    $this->logger->debug('refund data', [$registeredRefundAmount, $unzerRefundAmount,$registeredRefund->get_date_created()->getTimestamp(), strtotime($unzerRefund->getDate())]);
                     if (abs($registeredRefundAmount - $unzerRefundAmount) <= 0.01) {
                         $timeDifference = abs($registeredRefund->get_date_created()->getTimestamp() - strtotime($unzerRefund->getDate()));
                         if ($timeDifference <= 10) {
                             //we consider this a match with some tolerance
-                            update_post_meta($registeredRefund->get_id(), Main::ORDER_META_KEY_CANCELLATION_ID, $unzerRefund->getId());
+                            update_post_meta($registeredRefund->get_id(), Main::ORDER_META_KEY_CANCELLATION_ID, $refundMatchingId);
+                            $this->logger->debug('refund data match', [$registeredRefundAmount, $unzerRefundAmount,$registeredRefund->get_date_created()->getTimestamp(), strtotime($unzerRefund->getDate())]);
                             continue 2;
                         }
                     }
                 }
+                $this->logger->debug('refund data no match', [$unzerRefundAmount, $unzerRefund->getId()]);
                 //at this point there was no match found in the existing WooC refunds, so we create one
                 $this->createShopRefund($orderId, $unzerRefund);
             }
@@ -279,7 +299,7 @@ class OrderService
         if ($shopRefund instanceof WC_Order_Refund) {
             $order = wc_get_order($orderId);
             $order->add_order_note('Refund created from Unzer cancellation ' . $unzerRefund->getId());
-            update_post_meta($shopRefund->get_id(), Main::ORDER_META_KEY_CANCELLATION_ID, $unzerRefund->getId());
+            update_post_meta($shopRefund->get_id(), Main::ORDER_META_KEY_CANCELLATION_ID, self::getUnzerCancellationId($unzerRefund));
             (new LogService())->warning('refund created from unzer cancellation', ['refund' => $shopRefund, 'unzerRefund' => $unzerRefund]);
         } else {
             (new LogService())->warning('unable to create shop refund from unzer cancellation', ['order' => $orderId, 'cancellation' => $unzerRefund, 'response' => $shopRefund]);
@@ -291,6 +311,19 @@ class OrderService
         $processedAmount = $unzerPayment->getAmount()->getTotal();
         (new LogService())->debug('compare amounts', [$processedAmount, $order->get_total()]);
         return number_format($processedAmount, 2) === number_format($order->get_total(), 2);
+    }
+
+    public static function getUnzerCancellationId(Cancellation $unzerCancellation){
+        $id = $unzerCancellation->getId();
+        try{
+            $parentTransaction = $unzerCancellation->getParentResource();
+            if($parentTransaction instanceof AbstractTransactionType){
+                $id .= '---'.$parentTransaction->getId();
+            }
+        }catch (Exception $e){
+            //silent
+        }
+        return $id;
     }
 
 }

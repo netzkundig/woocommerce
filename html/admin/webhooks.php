@@ -47,7 +47,7 @@ $ajaxUrl = WC()->api_request_url(AdminController::WEBHOOK_MANAGEMENT_ROUTE_SLUG)
                         <td>${webhook.id}</td>
                         <td>${webhook.event}</td>
                         <td>${webhook.url}</td>
-                        <td><a href="#" onclick="unzerDeleteWebhook('${webhook.id}'); return false;" class="button button-small">Delete Webhook</a></td>
+                        <td><a href="#" onclick="unzerDeleteWebhook('${webhook.id}'); return false;" class="button button-small"><?php echo __('Delete', UNZER_PLUGIN_NAME); ?></a></td>
                     </tr>
                 `;
                     }
@@ -59,9 +59,9 @@ $ajaxUrl = WC()->api_request_url(AdminController::WEBHOOK_MANAGEMENT_ROUTE_SLUG)
                 let statusText = '';
                 if (!data.isRegistered) {
                     addWebhook = '<a href="#" onclick="unzerAddCurrentWebhook(); return false;" class="button button-small button-primary">Add Webhook</a>';
-                    statusText = '<div style="color:#dc1b1b;"><span class="unzer-status-circle" style="background:#cc0000;"></span> Webhook is not active</div>'
+                    statusText = '<div style="color:#dc1b1b;"><span class="unzer-status-circle" style="background:#cc0000;"></span> Webhook is not active</div>';
                 }else{
-                    statusText = '<div><span class="unzer-status-circle" style="background:#00a800;"></span>Webhook is active</div>'
+                    statusText = '<div><span class="unzer-status-circle" style="background:#00a800;"></span><?php echo __('Webhook is active', UNZER_PLUGIN_NAME); ?></div>';
                 }
 
                 document.getElementById('unzer-webhook-actions').innerHTML = addWebhook;

@@ -8,6 +8,7 @@ use UnzerPayments\Gateways\AbstractGateway;
 use UnzerPayments\Gateways\Prepayment;
 use UnzerPayments\Main;
 use UnzerSDK\Exceptions\UnzerApiException;
+use UnzerSDK\Resources\AbstractUnzerResource;
 use UnzerSDK\Resources\TransactionTypes\AbstractTransactionType;
 use UnzerSDK\Resources\TransactionTypes\Authorization;
 use UnzerSDK\Resources\TransactionTypes\Cancellation;
@@ -177,39 +178,43 @@ class PaymentService
      * @throws UnzerApiException
      * @throws Exception
      */
-    public function performRefundOrReversal($orderId, AbstractGateway $paymentGateway, $amount): Cancellation
+    public function performRefundOrReversal($orderId, AbstractGateway $paymentGateway, $amount): AbstractUnzerResource
     {
         $unzer = $this->getUnzerManager($paymentGateway);
         $paymentId = get_post_meta($orderId, Main::ORDER_META_KEY_PAYMENT_ID, true);
-
+        $maxCaptureRefund = 0;
+        $numberOfRefundsPossible = 0;
         if (empty($paymentId)) {
             throw new Exception('This is not an Unzer payment');
         }
-        $chargeId = get_post_meta($orderId, 'unzer_charge_id', true);
-        if ($chargeId) {
-            $charge = $unzer->fetchChargeById($paymentId, $chargeId);
-            return $charge->cancel($amount);
-        } else {
-            $payment = $unzer->fetchPayment($paymentId);
-            if ($payment->getCharges()) {
-                //TODO handle several charges
-                /** @var Charge $mainCharge */
-                $mainCharge = $payment->getCharges()[0];
+
+        $payment = $unzer->fetchPayment($paymentId);
+        if ($payment->getCharges()) {
+            /** @var Charge $charge */
+            foreach($payment->getCharges() as $charge) {
                 try {
-                    return $mainCharge->cancel($amount);
+                    if($charge->getTotalAmount() > 0){
+                        $numberOfRefundsPossible++;
+                    }
+                    $maxCaptureRefund = max($charge->getTotalAmount(), $maxCaptureRefund);
+                    if($charge->getTotalAmount() < $amount){
+                        continue;
+                    }
+                    return $charge->cancel($amount, null, 'fromWordpressOrder' . $orderId . '_' . uniqid());
                 } catch (Exception $e) {
-                    $this->logger->warning('refund on charge not possible: '.$e->getMessage());
+                    $this->logger->warning('refund on charge not possible: ' . $e->getMessage());
                 }
             }
-            try {
-                $authorization = $unzer->fetchAuthorization($paymentId);
-                return $authorization->cancel($amount);
-            } catch (Exception $e) {
-                $this->logger->warning('refund on authorization not possible: '.$e->getMessage());
-            }
         }
-        throw new Exception('Unable to do refund');
+        try {
+            $authorization = $unzer->fetchAuthorization($paymentId);
+            return $authorization->cancel($amount);
+        } catch (Exception $e) {
+            $this->logger->warning('refund on authorization not possible: ' . $e->getMessage());
+        }
+        throw new Exception(sprintf(__('Unable to do refund: Maximum amount for single refund is %s.'), html_entity_decode(strip_tags(wc_price($maxCaptureRefund, ['currency'=>$payment->getCurrency()])))).($numberOfRefundsPossible > 1?' '.sprintf(__('However, you may refund in up to %s smaller chunks.'), $numberOfRefundsPossible):''));
     }
+
 
     public function removeTransactionMetaData($orderId)
     {

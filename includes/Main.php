@@ -123,7 +123,7 @@ class Main
                     'value' => get_option('unzer_public_key'),
                 ],
                 'authorized_order_status' => [
-                    'title' => __('Order status for authorized orders', UNZER_PLUGIN_NAME),
+                    'title' => __('Order status for authorized payments', UNZER_PLUGIN_NAME),
                     'label' => '',
                     'type' => 'select',
                     'desc' => __('This status is assigned for orders, that are authorized', UNZER_PLUGIN_NAME),
@@ -132,7 +132,7 @@ class Main
                     'value' => get_option('unzer_authorized_order_status'),
                 ],
                 'captured_order_status' => [
-                    'title' => __('Order status for captured orders', UNZER_PLUGIN_NAME),
+                    'title' => __('Order status for captured payments', UNZER_PLUGIN_NAME),
                     'label' => '',
                     'type' => 'select',
                     'desc' => __('This status is assigned for orders, that are captured', UNZER_PLUGIN_NAME),

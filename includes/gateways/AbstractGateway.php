@@ -70,12 +70,13 @@ abstract class AbstractGateway extends WC_Payment_Gateway
     public function process_refund($order_id, $amount = null, $reason = '')
     {
         try {
-            $cancellation = (new PaymentService())->performRefundOrReversal($order_id, $this, $amount);
+            $paymentService = new PaymentService();
+            $cancellation = $paymentService->performRefundOrReversal($order_id, $this, $amount);
             return $cancellation->isSuccess();
         }catch (\Exception $e){
             $this->logger->error('refund error: '.$e->getMessage(), ['orderId'=>$order_id, 'amount'=>$amount]);
+            throw $e;
         }
-        return false;
     }
 
     public function get_confirm_url()

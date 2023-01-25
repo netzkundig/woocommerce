@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Unzer Payments\n"
-"POT-Creation-Date: 2022-12-20 16:17+0100\n"
-"PO-Revision-Date: 2022-12-20 16:44+0100\n"
+"POT-Creation-Date: 2023-01-24 23:33+0100\n"
+"PO-Revision-Date: 2023-01-24 23:34+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -26,6 +26,74 @@ msgstr ""
 msgid "General settings"
 msgstr "Allgemeine Einstellungen"
 
+#: html/admin/global-settings-start.php:22
+msgid "Keys are not valid"
+msgstr "Schlüssel sind nicht gültig"
+
+#: html/admin/global-settings-start.php:24
+msgid "Keys are valid"
+msgstr "Schlüssel sind gültig"
+
+#: html/admin/transactions.php:9
+msgid "Payment Instructions"
+msgstr "Zahlungsanweisungen"
+
+#: html/admin/transactions.php:14
+msgid "Totals"
+msgstr "Gesamt"
+
+#: html/admin/transactions.php:20
+msgid "Detailed Transactions"
+msgstr "Detaillierte Transaktionen"
+
+#: html/admin/transactions.php:24
+msgid "Time"
+msgstr "Zeit"
+
+#: html/admin/transactions.php:25
+msgid "Type"
+msgstr "Typ"
+
+#: html/admin/transactions.php:27
+msgid "Amount"
+msgstr "Menge"
+
+#: html/admin/transactions.php:28
+msgid "Status"
+msgstr "Status"
+
+#: html/admin/transactions.php:37
+msgid "Show Debug Information"
+msgstr "Debug-Informationen anzeigen"
+
+#: html/admin/transactions.php:78
+msgid "Capture Amount"
+msgstr "Betrag einziehen"
+
+#: html/admin/transactions.php:83
+msgid "Total amount"
+msgstr "Gesamtbetrag"
+
+#: html/admin/transactions.php:84
+msgid "Charged amount"
+msgstr "Eingezogener Betrag"
+
+#: html/admin/transactions.php:85
+msgid "Cancelled amount"
+msgstr "Erstatteter Betrag"
+
+#: html/admin/transactions.php:86
+msgid "Remaining amount"
+msgstr "Verbleibender Betrag"
+
+#: html/admin/webhooks.php:50
+msgid "Delete"
+msgstr "Löschen"
+
+#: html/admin/webhooks.php:64
+msgid "Webhook is active"
+msgstr "Webhook ist aktiv"
+
 #: includes/Main.php:94
 msgid "Unzer Transactions"
 msgstr "Unzer-Transaktionen"
@@ -43,8 +111,8 @@ msgid "Public Key"
 msgstr "Öffentlicher Schlüssel"
 
 #: includes/Main.php:126
-msgid "Order status for authorized orders"
-msgstr "Auftragsstatus für autorisierte Aufträge"
+msgid "Order status for authorized payments"
+msgstr "Auftragsstatus für Aufträge mit autorisierter Zahlung"
 
 #: includes/Main.php:129
 msgid "This status is assigned for orders, that are authorized"
@@ -55,7 +123,7 @@ msgid "[Use WooC default status]"
 msgstr "[WooC-Standardstatus verwenden]"
 
 #: includes/Main.php:135
-msgid "Order status for captured orders"
+msgid "Order status for captured payments"
 msgstr "Auftragsstatus für Aufträge mit eingezogener Zahlung"
 
 #: includes/Main.php:138
@@ -90,11 +158,11 @@ msgstr ""
 "Anmeldedaten ein <br><a href=\"%s\" class=\"button-primary\">API-"
 "Einstellungen</a>"
 
-#: includes/gateways/AbstractGateway.php:92
+#: includes/gateways/AbstractGateway.php:93
 msgid "Select another Unzer payment method"
 msgstr "Wählen Sie eine andere Unzer-Zahlungsmethode"
 
-#: includes/gateways/AbstractGateway.php:93
+#: includes/gateways/AbstractGateway.php:94
 msgid "Return to payments"
 msgstr "Zurück zu den Zahlungen"
 
@@ -324,13 +392,25 @@ msgstr "Aktivieren Sie Unzer WeChat Pay"
 msgid "WeChat Pay"
 msgstr "WeChat Bezahlen"
 
-#: includes/services/OrderService.php:212
+#: includes/services/OrderService.php:226
 msgid "Payment complete event failed."
-msgstr "Abschluss der Zahlung ist fehlgeschlagen"
+msgstr "Abschluss der Zahlung ist fehlgeschlagen."
+
+#: includes/services/PaymentService.php:215
+#, php-format
+msgid "Unable to do refund: Maximum amount for single refund is %s."
+msgstr ""
+"Erstattung nicht möglich: Maximaler Betrag für eine einzelne Erstattung ist "
+"%s."
+
+#: includes/services/PaymentService.php:215
+#, php-format
+msgid "However, you may refund in up to %s smaller chunks."
+msgstr "Es ist jedoch möglich bis zu %s einzelne Erstattungen vorzunehmen."
 
 #: unzer-payments.php:37
 msgid "Unzer requires WooCommerce to be installed and active."
-msgstr "WooCommerce muss installiert und aktiv sein"
+msgstr "WooCommerce muss installiert und aktiv sein."
 
 #. Plugin Name of the plugin/theme
 msgid "Unzer Payments"

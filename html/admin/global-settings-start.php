@@ -19,9 +19,9 @@
 
                     let statusText = '';
                     if (data.isValid === 0) {
-                        statusText = '<div style="color:#dc1b1b;"><span class="unzer-status-circle" style="background:#cc0000;"></span> Keys are not valid</div>'
+                        statusText = '<div style="color:#dc1b1b;"><span class="unzer-status-circle" style="background:#cc0000;"></span> <?php echo __('Keys are not valid', UNZER_PLUGIN_NAME); ?></div>'
                     } else if (data.isValid === 1) {
-                        statusText = '<div><span class="unzer-status-circle" style="background:#00a800;"></span>Keys are valid</div>'
+                        statusText = '<div><span class="unzer-status-circle" style="background:#00a800;"></span> <?php echo __('Keys are valid', UNZER_PLUGIN_NAME); ?></div>'
                     }
                     document.getElementById('unzer-key-status').innerHTML = statusText;
                 });

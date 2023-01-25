@@ -225,12 +225,12 @@ const UnzerManager = {
     },
 
     getCheckoutForm() {
-        return jQuery('.woocommerce-checkout');
+        return jQuery('form.woocommerce-checkout');
     },
     error(message) {
         jQuery('.woocommerce-NoticeGroup-checkout, .woocommerce-error, .woocommerce-message').remove();
         const $checkoutForm = UnzerManager.getCheckoutForm();
-        $checkoutForm.prepend('<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' + message + '</div>'); // eslint-disable-line max-len
+        $checkoutForm.prepend('<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout"><div class="woocommerce-error">' + message + '</div></div>'); // eslint-disable-line max-len
         $checkoutForm.removeClass('processing').unblock();
         $checkoutForm.find('.input-text, select, input:checkbox').trigger('validate').trigger('blur');
         UnzerManager.scrollToNotices();

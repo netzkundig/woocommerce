@@ -6,25 +6,26 @@ $paymentInstructions = get_post_meta($_GET['post'], \UnzerPayments\Main::ORDER_M
 
 if ($paymentInstructions) {
     ?>
-    <h3>Payment Instructions</h3>
+    <h3><?php echo __('Payment Instructions', UNZER_PLUGIN_NAME); ?></h3>
     <div><?php echo $paymentInstructions; ?></div>
     <?php
 }
 ?>
-<h3>Totals</h3>
+<h3><?php echo __('Totals', UNZER_PLUGIN_NAME); ?></h3>
 <table id="unzer-sums">
     <tbody id="unzer-sums-body">
 
     </tbody>
 </table>
-<h3>Detailed Transactions</h3>
+<h3><?php echo __('Detailed Transactions', UNZER_PLUGIN_NAME); ?></h3>
 <table id="unzer-transactions" style="width: 100%;">
     <thead style="text-align: left;">
     <tr>
-        <th>Time</th>
-        <th>Type</th>
-        <th>Amount</th>
-        <th>Status</th>
+        <th><?php echo __('Time', UNZER_PLUGIN_NAME); ?></th>
+        <th><?php echo __('Type', UNZER_PLUGIN_NAME); ?></th>
+        <th>ID</th>
+        <th><?php echo __('Amount', UNZER_PLUGIN_NAME); ?></th>
+        <th><?php echo __('Status', UNZER_PLUGIN_NAME); ?></th>
     </tr>
     </thead>
     <tbody id="unzer-transactions-body">
@@ -33,7 +34,7 @@ if ($paymentInstructions) {
 </table>
 <div style="margin-top:20px;">
     <a href="#" onclick="document.getElementById('unzer-debug').style.display = 'block'; return false;" class="button">
-        Show Debug Information
+        <?php echo __('Show Debug Information', UNZER_PLUGIN_NAME); ?>
     </a>
     <pre id="unzer-debug" style="display: none; font-size:10px;">
 
@@ -62,6 +63,7 @@ $chargeUrl = WC()->api_request_url(AdminController::CHARGE_ROUTE_SLUG);
                     <tr style="color:${color};">
                         <td>${transaction.time}</td>
                         <td>${transaction.type}</td>
+                        <td>${transaction.id}</td>
                         <td>${transaction.amount}</td>
                         <td>${transaction.status}</td>
                     </tr>
@@ -73,15 +75,15 @@ $chargeUrl = WC()->api_request_url(AdminController::CHARGE_ROUTE_SLUG);
                 let captureAction = '';
                 if (data.remainingPlain) {
                     captureAction = '<div><input type="number" step="0.01" min="0.01"  max="'+data.remainingPlain+'" value="'+data.remainingPlain+'" id="unzer-capture-amount-input" /></div> ' +
-                        '<a href="#" onclick="unzerCaptureOrder(unzerOrderId, document.getElementById(\'unzer-capture-amount-input\').value); return false;" class="button button-small" style="width:100%; text-align: center;">Capture Amount</a>'
+                        '<a href="#" onclick="unzerCaptureOrder(unzerOrderId, document.getElementById(\'unzer-capture-amount-input\').value); return false;" class="button button-small" style="width:100%; text-align: center;"><?php echo __('Capture Amount', UNZER_PLUGIN_NAME); ?></a>'
 
                 }
 
                 let amountHtml = `
-                <tr><th style="text-align: left;">Total amount: </th><td style="text-align: right;">${data.amount}</td></tr>
-                <tr><th style="text-align: left;">Charged amount: </th><td style="text-align: right;">${data.charged}</td></tr>
-                <tr><th style="text-align: left;">Cancelled amount: </th><td style="text-align: right;">${data.cancelled}</td></tr>
-                <tr><th style="text-align: left;">Remaining amount: </th><td style="text-align: right;">${data.remaining}</td></tr>
+                <tr><th style="text-align: left;"><?php echo __('Total amount', UNZER_PLUGIN_NAME); ?>: </th><td style="text-align: right;">${data.amount}</td></tr>
+                <tr><th style="text-align: left;"><?php echo __('Charged amount', UNZER_PLUGIN_NAME); ?>: </th><td style="text-align: right;">${data.charged}</td></tr>
+                <tr><th style="text-align: left;"><?php echo __('Cancelled amount', UNZER_PLUGIN_NAME); ?>: </th><td style="text-align: right;">${data.cancelled}</td></tr>
+                <tr><th style="text-align: left;"><?php echo __('Remaining amount', UNZER_PLUGIN_NAME); ?>: </th><td style="text-align: right;">${data.remaining}</td></tr>
                 <tr><td colspan="2">${captureAction}</td></tr>
             `;
 

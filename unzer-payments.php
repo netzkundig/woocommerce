@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name: Unzer Payments
- * Plugin URI: https://github.com/unzerdev/woocommerce
+ * Plugin URI:
  * Description: Official Unzer Plugin
  * Author: Unzer
  * Author URI: https://www.unzer.com
  * Version: 1.0.0
  * Requires at least: 4.5
- * Tested up to: 6.1
+ * Tested up to:
  * WC requires at least: 6.0
- * WC tested up to: 7.2
+ * WC tested up to:
  * Text Domain: unzer-payments
  *
  */
@@ -21,14 +21,14 @@ if (!defined('ABSPATH')) {
 /**
  * Required minimums and constants
  */
-define('UNZER_VERSION', '1.0.0');
+define('UNZER_VERSION', '0.0.1');
 define('UNZER_PLUGIN_TYPE_STRING', 'Unzer Payments');
 define('UNZER_PLUGIN_URL', untrailingslashit(plugins_url(basename(plugin_dir_path(__FILE__)), basename(__FILE__))));
 define('UNZER_PLUGIN_PATH', __DIR__ . '/');
 define('UNZER_PLUGIN_NAME', 'unzer-payments');
 
 add_action('init', function () {
-    load_plugin_textdomain(UNZER_PLUGIN_NAME, false, __DIR__ . '/languages');
+    load_plugin_textdomain(UNZER_PLUGIN_NAME, false, basename(__DIR__) . '/languages');
 });
 
 add_action('plugins_loaded', function () {

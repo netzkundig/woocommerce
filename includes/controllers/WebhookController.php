@@ -34,9 +34,15 @@ class WebhookController
 
     public function receiveWebhook()
     {
-        $data = json_decode(file_get_contents('php://input'), true);
-        //$data = unserialize('a:4:{s:5:"event";s:15:"charge.canceled";s:9:"publicKey";s:38:"s-pub-2a10SPT8OwkWUbkLNCygS7kug5JOY3KW";s:11:"retrieveUrl";s:83:"https://sbx-api.heidelpay.com/v1/payments/s-pay-293/charges/s-chg-1/cancels/s-cnl-1";s:9:"paymentId";s:9:"s-pay-292";}');
-
+        if($_GET['test']){
+            $data = [
+                'event'=>'authorize.canceled',
+                'paymentId'=>'s-pay-398'
+            ];
+        }else {
+            $data = json_decode(file_get_contents('php://input'), true);
+            //$data = unserialize('a:4:{s:5:"event";s:15:"charge.canceled";s:9:"publicKey";s:38:"s-pub-2a10SPT8OwkWUbkLNCygS7kug5JOY3KW";s:11:"retrieveUrl";s:83:"https://sbx-api.heidelpay.com/v1/payments/s-pay-293/charges/s-chg-1/cancels/s-cnl-1";s:9:"paymentId";s:9:"s-pay-292";}');
+        }
         if (empty($data)) {
             $this->logger->debug('empty webhook', ['server' => $_SERVER]);
             status_header(404);
@@ -86,8 +92,8 @@ class WebhookController
 
     private function handleCancel($paymentId, $orderId)
     {
-        sleep(1);
-        $this->logger->debug('webhook handleChargeCanceled', ['paymentId' => $paymentId, 'orderId' => $orderId]);
+        sleep(2);
+        $this->logger->debug('webhook handleCancel', ['paymentId' => $paymentId, 'orderId' => $orderId]);
         $this->orderService->updateRefunds($paymentId, $orderId);
     }
 
